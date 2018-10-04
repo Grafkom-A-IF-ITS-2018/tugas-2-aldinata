@@ -113,49 +113,54 @@
       var xDirect = 1.0, yDirect = 1.0, zDirect = 1.0
       var rot = 1.0
       function cekCollision(sMat, cMat) {
-        //console.log(xDirect, yDirect, zDirect)
+        //x ke kanan
         for (var i = 0; i < sMat.length; i++) {
-          if (sMat[i][0] >= cMat[1][0]) { //x to right
+          if (sMat[i][0] >= cMat[1][0]) {
             if (xDirect > 0) {
               xDirect = xDirect * (-1.0)
               arahRotasi = arahRotasi * -1.0
             }
           }
         }
+        //x ke kiri
         for (var i = 0; i < sMat.length; i++) {
-          if (sMat[i][0] <= cMat[0][0]) { // x to left
+          if (sMat[i][0] <= cMat[0][0]) {
             if (xDirect < 0) {
               xDirect = xDirect*(-1.0)
               arahRotasi = arahRotasi * -1.0
             }
           } 
         }
+         //y ke atas
         for (var i = 0; i < sMat.length; i++) {
-          if (sMat[i][1] >= cMat[1][1]) { // y to top
+          if (sMat[i][1] >= cMat[1][1]) {
             if (yDirect > 0) {
               yDirect = yDirect*(-1.0)
               arahRotasi = arahRotasi * -1.0
             }
           }
         }
+        //y ke bawah
         for (var i = 0; i < sMat.length; i++) {
-          if (sMat[i][1] <= cMat[2][1]) { // y to bott
+          if (sMat[i][1] <= cMat[2][1]) {
             if (yDirect < 0) {
               yDirect = yDirect*(-1.0)
               arahRotasi = arahRotasi * -1.0
             }
           }
         }
+        //z ke belakang
         for (var i = 0; i < sMat.length; i++) {
-          if (sMat[i][2] >= cMat[0][2]) {// z to behind
+          if (sMat[i][2] >= cMat[0][2]) {
             if (zDirect > 0) {
               zDirect = zDirect*(-1.0)
               arahRotasi = arahRotasi * -1.0
             }
           }
         }
+        //z ke depan
         for (var i = 0; i < sMat.length; i++) {
-          if (sMat[i][2] <= cMat[4][2]) { // z to front
+          if (sMat[i][2] <= cMat[4][2]) {
             if (zDirect < 0) {
               zDirect = zDirect*(-1.0)
               arahRotasi = arahRotasi * -1.0
@@ -178,10 +183,10 @@
       var triangleVertexIndexBuffer
       var squareVertexPositionBuffer
       var squareVertexColorBuffer
-      var sBound = []
-      var ss
-      var cBound = []
-      var cb
+      var hurufBound = []
+      var huruf
+      var kubusBound = []
+      var kubus
       function initBuffers() {
         // buffer huruf D
         triangleVertexPositionBuffer = gl.createBuffer()
@@ -252,7 +257,7 @@
           -0.8, -2.8, 0.5
         ]
         
-        sBound = [
+        hurufBound = [
           [-2.0, 4.0, -0.5, 1.0],
           [-2.0, 4.0, 0.5, 1.0],
           [-0.8, 4.0, -0.5, 1.0],
@@ -391,7 +396,7 @@
           -10.0, 10.0, -10.0
         ]
         
-        cBound = [
+        kubusBound = [
           [-10.0, 10.0, 10.0, 1.0],
           [10.0, 10.0, 10.0, 1.0],
           [10.0, -10.0, 10.0, 1.0],
@@ -431,7 +436,8 @@
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
         mat4.perspective(pMatrix, glMatrix.toRadian(45), gl.viewportWidth / gl.viewportHeight, 0.1, 500.0)
         mat4.identity(mvMatrix)
-        //character
+
+        //huruf D
         mat4.translate(mvMatrix, mvMatrix, [0.0, 0.0, -50.0])
         mvPushMatrix()
         mat4.translate(mvMatrix, mvMatrix, [a, b, c])
@@ -441,20 +447,18 @@
         gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, triangleVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0)
         gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexColorBuffer)
         gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, triangleVertexColorBuffer.itemSize, gl.FLOAT, false, 0, 0)
-        
         sMat = []
-        for (var x = 0 ; x < sBound.length ; x++){
-          ss = matrixMul(mvMatrix, sBound[x])
-          sMat.push(ss)
+        for (var x = 0 ; x < hurufBound.length ; x++){
+          huruf = matrixMul(mvMatrix, hurufBound[x])
+          sMat.push(huruf)
         }
-
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, triangleVertexIndexBuffer);
         setMatrixUniforms()
         gl.drawElements(gl.TRIANGLES, triangleVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
         mvPopMatrix()
 
-        // kubus
-        mat4.translate(mvMatrix, mvMatrix, [0.0, 0.0, 10.0])
+        //kubus
+        mat4.translate(mvMatrix, mvMatrix, [0.0, 0.0, 12.0])
         mvPushMatrix()
         mat4.rotate(mvMatrix, mvMatrix, glMatrix.toRadian(rSquare), [0.0, 0.0, 0.0])
         //mat4.rotateX(mvMatrix, mvMatrix, glMatrix.toRadian(rSquare))
@@ -462,20 +466,21 @@
         gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, squareVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0)
         gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexColorBuffer)
         gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, squareVertexColorBuffer.itemSize, gl.FLOAT, false, 0, 0)
-
         cMat = []
-        for (var y = 0 ; y <cBound.length ; y++){
-          cb = matrixMul(mvMatrix, cBound[y])
-          cMat.push(cb)
+        for (var y = 0 ; y <kubusBound.length ; y++){
+          kubus = matrixMul(mvMatrix, kubusBound[y])
+          cMat.push(kubus)
         }
-
         setMatrixUniforms()
         gl.drawArrays(gl.LINES, 0, squareVertexPositionBuffer.numItems)
         mvPopMatrix()
 
+        //cek tepi kubus
         cekCollision(sMat, cMat)
       }
 
+
+      //translasi huruf, semakin besar makin terlihat cepat
       function mobile(){
         a+=0.05 * xDirect
         b+=0.05 * yDirect 
@@ -488,7 +493,7 @@
         if (lastTime != 0) {
           var elapsed = timeNow - lastTime
           rTri += ((90 * elapsed) / 1000.0)*arahRotasi
-          // rSquare += (75 * elapsed) / 1000.0
+          //rSquare += (75 * elapsed) / 1000.0
           mobile()
         }
         lastTime = timeNow
@@ -511,8 +516,9 @@
       }
     </script>
   </head>
+
   <body onload="webGLStart();">
     <div style="text-align: center;">
-    <canvas id="mycanvas" style="border: none" width="600" height="600"></canvas>
+    <canvas id="mycanvas" style="border: none" width="700" height="600"></canvas>
   </body>
 </html>
