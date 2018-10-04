@@ -1,6 +1,6 @@
 <html>
   <head>
-    <title>Tugas 2</title>
+    <title>Tugas2-Aldinata</title>
     <meta http-equiv="content-type" content="text/html" charset="ISO-8859-1">
 
     <script type="text/javascript" src="gl-matrix-min.js"></script>
@@ -37,6 +37,7 @@
           alert('Tidak bisa menginisialisasi WebGL')
         }
       }
+
       function getShader(gl, id) {
         var shaderScript = document.getElementById(id)
         if (!shaderScript) {
@@ -66,6 +67,7 @@
         }
         return shader
       }
+
       var shaderProgram
       function initShaders() {
         var fragmentShader = getShader(gl, 'shader-fs')
@@ -85,6 +87,7 @@
         shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, 'uPMatrix')
         shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, 'uMVMatrix')
       }
+
       var mvMatrix = mat4.create()
       var mvMatrixStack = []
       var pMatrix = mat4.create()
@@ -93,19 +96,83 @@
         mat4.copy(copy, mvMatrix)
         mvMatrixStack.push(copy)
       }
+      
       function mvPopMatrix() {
         if (mvMatrixStack.length == 0) {
           throw "Tumpukan matriks kosong"
         }
         mvMatrix = mvMatrixStack.pop()
       }
+
       function setMatrixUniforms() {
         gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, pMatrix)
         gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, mvMatrix)
       }
 
-
       var arahRotasi = 1.0 
+      var xDirect = 1.0, yDirect = 1.0, zDirect = 1.0
+      var rot = 1.0
+      function cekCollision(sMat, cMat) {
+        //console.log(xDirect, yDirect, zDirect)
+        for (var i = 0; i < sMat.length; i++) {
+          if (sMat[i][0] >= cMat[1][0]) { //x to right
+            if (xDirect > 0) {
+              xDirect = xDirect * (-1.0)
+              arahRotasi = arahRotasi * -1.0
+            }
+          }
+        }
+        for (var i = 0; i < sMat.length; i++) {
+          if (sMat[i][0] <= cMat[0][0]) { // x to left
+            if (xDirect < 0) {
+              xDirect = xDirect*(-1.0)
+              arahRotasi = arahRotasi * -1.0
+            }
+          } 
+        }
+        for (var i = 0; i < sMat.length; i++) {
+          if (sMat[i][1] >= cMat[1][1]) { // y to top
+            if (yDirect > 0) {
+              yDirect = yDirect*(-1.0)
+              arahRotasi = arahRotasi * -1.0
+            }
+          }
+        }
+        for (var i = 0; i < sMat.length; i++) {
+          if (sMat[i][1] <= cMat[2][1]) { // y to bott
+            if (yDirect < 0) {
+              yDirect = yDirect*(-1.0)
+              arahRotasi = arahRotasi * -1.0
+            }
+          }
+        }
+        for (var i = 0; i < sMat.length; i++) {
+          if (sMat[i][2] >= cMat[0][2]) {// z to behind
+            if (zDirect > 0) {
+              zDirect = zDirect*(-1.0)
+              arahRotasi = arahRotasi * -1.0
+            }
+          }
+        }
+        for (var i = 0; i < sMat.length; i++) {
+          if (sMat[i][2] <= cMat[4][2]) { // z to front
+            if (zDirect < 0) {
+              zDirect = zDirect*(-1.0)
+              arahRotasi = arahRotasi * -1.0
+            }
+          }
+        }
+      }
+
+      function matrixMul(mv, l) {
+        var x = mv[0]*l[0] + mv[4]*l[1] + mv[8]*l[2] + mv[12]*l[3]
+        var y = mv[1]*l[0] + mv[5]*l[1] + mv[9]*l[2] + mv[13]*l[3]
+        var z = mv[2]*l[0] + mv[6]*l[1] + mv[10]*l[2] + mv[14]*l[3]
+        var i = mv[3]*l[0] + mv[7]*l[1] + mv[11]*l[2] + mv[15]*l[3]
+        //console.log('after', x,y,z,i)
+        return [x, y, z, i]
+      }
+
       var triangleVertexPositionBuffer
       var triangleVertexColorBuffer
       var triangleVertexIndexBuffer
@@ -121,20 +188,20 @@
         gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexPositionBuffer)
         var vertices = [
           // depan 0-13
-          -2.0, 4.0, 0.5,//0
-          -0.8, 4.0, 0.5,//1
-          -0.8, 2.8, 0.5,//2
-          1.0, 3.2, 0.5,//3
-          0.4, 2.0, 0.5,//4
-          2.0, 1.4, 0.5,//5
-          0.8, 1.0, 0.5,//6
-          2.0, -1.4, 0.5,//7
-          0.8, -1.0, 0.5,//8
-          1.0, -3.2, 0.5,//9
-          0.4, -2.0, 0.5,//10
-          -0.8, -4.0, 0.5,//11
-          -0.8, -2.8, 0.5,//12
-          -2.0, -4.0, 0.5,//13
+          -2.0, 4.0, 0.5,
+          -0.8, 4.0, 0.5,
+          -0.8, 2.8, 0.5,
+          1.0, 3.2, 0.5,
+          0.4, 2.0, 0.5,
+          2.0, 1.4, 0.5,
+          0.8, 1.0, 0.5,
+          2.0, -1.4, 0.5,
+          0.8, -1.0, 0.5,
+          1.0, -3.2, 0.5,
+          0.4, -2.0, 0.5,
+          -0.8, -4.0, 0.5,
+          -0.8, -2.8, 0.5,
+          -2.0, -4.0, 0.5,
 
           // belakang 14-27
           -2.0, 4.0, -0.5,
@@ -184,7 +251,7 @@
           -0.8, -2.8, -0.5,
           -0.8, -2.8, 0.5
         ]
-        /////////////////////////---------------
+        
         sBound = [
           [-2.0, 4.0, -0.5, 1.0],
           [-2.0, 4.0, 0.5, 1.0],
@@ -201,20 +268,21 @@
           [-0.8, -4.0, -0.5, 1.0],
           [-0.8, -4.0, 0.5, 1.0],
           [-2.0, -4.0, -0.5, 1.0],
-          [-2.0, -4.0, 0.5, 1.0],
+          [-2.0, -4.0, 0.5, 1.0]
         ]
 
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW)
         triangleVertexPositionBuffer.itemSize = 3
         triangleVertexPositionBuffer.numItems = 56
-        // character Color
+        
+        // buffer color huruf D
         triangleVertexColorBuffer = gl.createBuffer()
         gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexColorBuffer)
         var colors = [
-          [1.0, 0.0, 0.0, 1.0], // depan
-          [1.0, 0.0, 0.0, 1.0], // belakang
-          [0.0, 1.0, 0.0, 1.0], // samping luar
-          [0.0, 1.0, 0.0, 1.0], // samping dalam
+          [1.0, 0.9, 0.0, 0.8], // depan
+          [1.0, 0.9, 0.0, 0.8], // belakang
+          [1.0, 0.65, 0.0, 0.9], // samping luar
+          [1.0, 0.5, 0.0, 1.0], // samping dalam
         ]
         var unpackedColors = [];
         var color = colors[0];
@@ -248,7 +316,6 @@
             7, 8, 9,    8, 9, 10,
             9, 10, 11,  10, 11, 12,
 
-            
             //belakang
             14, 15, 27,   15, 27, 25,
             15, 16, 17,   16, 17, 18,
@@ -280,7 +347,7 @@
         triangleVertexIndexBuffer.numItems = 156;
         
 
-        // Square Position
+        // Buffer Rangka Kubus
         squareVertexPositionBuffer = gl.createBuffer()
         gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer)
         vertices = [
@@ -310,7 +377,7 @@
           -10.0, 10.0, -10.0,
           -10.0, -10.0, -10.0,
           
-          // lebar
+          //lebar
           -10.0, -10.0, 10.0,
           -10.0, -10.0, -10.0,
 
@@ -323,7 +390,7 @@
           -10.0, 10.0, 10.0,
           -10.0, 10.0, -10.0
         ]
-        //////////////////-------------
+        
         cBound = [
           [-10.0, 10.0, 10.0, 1.0],
           [10.0, 10.0, 10.0, 1.0],
@@ -339,92 +406,20 @@
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW)
         squareVertexPositionBuffer.itemSize = 3
         squareVertexPositionBuffer.numItems = 24
-        // Square Color
+        
+        // Buffer Color Kubus
         squareVertexColorBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexColorBuffer);
         colors = [];
         for (var i=0; i < 10; i++) {
-          colors = colors.concat([0.9, 0.2, 0.3, 1.0]);
-          colors = colors.concat([0.8, 0.5, 0.3, 1.0]);
-          colors = colors.concat([0.8, 0.1, 0.6, 1.0]);
-          colors = colors.concat([1.0, 0.8, 0.3, 1.0]);
+          colors = colors.concat([1.0, 0.6, 0.3, 1.0]);
+          colors = colors.concat([0.9, 0.2, 0.0, 1.0]);
+          colors = colors.concat([1.0, 0.6, 0.3, 1.0]);
+          colors = colors.concat([0.9, 0.2, 0.0, 1.0]);
         }
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
         squareVertexColorBuffer.itemSize = 4;
         squareVertexColorBuffer.numItems = 4;
-      }
-
-
-
-       var xDirect = 1.0, yDirect = 1.0, zDirect = 1.0
-      var rot = 1.0
-
-      function cekCollision(sMat, cMat) {
-        //console.log(xDirect, yDirect, zDirect)
-        for (var i = 0; i < sMat.length; i++) {
-          if (sMat[i][0] >= cMat[1][0]) { //x to right
-            if (xDirect > 0) {
-              xDirect = xDirect * (-1.0)
-              rot *= -1.0
-              arahRotasi = arahRotasi * -1.0
-            }
-          }
-        }
-        for (var i = 0; i < sMat.length; i++) {
-          if (sMat[i][0] <= cMat[0][0]) { // x to left
-            if (xDirect < 0) {
-              xDirect = xDirect*(-1.0)
-              rot *= -1.0
-              arahRotasi = arahRotasi * -1.0
-            }
-          } 
-        }
-        for (var i = 0; i < sMat.length; i++) {
-          if (sMat[i][1] >= cMat[1][1]) { // y to top
-            if (yDirect > 0) {
-              yDirect = yDirect*(-1.0)
-              rot *= -1.0
-              arahRotasi = arahRotasi * -1.0
-            }
-          }
-        }
-        for (var i = 0; i < sMat.length; i++) {
-          if (sMat[i][1] <= cMat[2][1]) { // y to bott
-            if (yDirect < 0) {
-              yDirect = yDirect*(-1.0)
-              rot *= -1.0
-              arahRotasi = arahRotasi * -1.0
-            }
-          }
-        }
-        for (var i = 0; i < sMat.length; i++) {
-          if (sMat[i][2] >= cMat[0][2]) {// z to behind
-            if (zDirect > 0) {
-              zDirect = zDirect*(-1.0)
-              rot *= -1.0
-              arahRotasi = arahRotasi * -1.0
-            }
-          }
-        }
-        for (var i = 0; i < sMat.length; i++) {
-          if (sMat[i][2] <= cMat[4][2]) { // z to front
-            if (zDirect < 0) {
-              zDirect = zDirect*(-1.0)
-              rot *= -1.0
-              arahRotasi = arahRotasi * -1.0
-            }
-          }
-        }
-      }
-
-      ////////////----------------------
-      function matrixMul(mv, l) {
-        var x = mv[0]*l[0] + mv[4]*l[1] + mv[8]*l[2] + mv[12]*l[3]
-        var y = mv[1]*l[0] + mv[5]*l[1] + mv[9]*l[2] + mv[13]*l[3]
-        var z = mv[2]*l[0] + mv[6]*l[1] + mv[10]*l[2] + mv[14]*l[3]
-        var i = mv[3]*l[0] + mv[7]*l[1] + mv[11]*l[2] + mv[15]*l[3]
-        //console.log('after', x,y,z,i)
-        return [x, y, z, i]
       }
 
 
@@ -437,7 +432,7 @@
         mat4.perspective(pMatrix, glMatrix.toRadian(45), gl.viewportWidth / gl.viewportHeight, 0.1, 500.0)
         mat4.identity(mvMatrix)
         //character
-        mat4.translate(mvMatrix, mvMatrix, [0.0, 0.0, -40.0])
+        mat4.translate(mvMatrix, mvMatrix, [0.0, 0.0, -50.0])
         mvPushMatrix()
         mat4.translate(mvMatrix, mvMatrix, [a, b, c])
         mat4.rotate(mvMatrix, mvMatrix, glMatrix.toRadian(rTri), [0.0, 1.0, 0.0])
@@ -459,7 +454,7 @@
         mvPopMatrix()
 
         // kubus
-        mat4.translate(mvMatrix, mvMatrix, [0.0, 0.0, 0.0])
+        mat4.translate(mvMatrix, mvMatrix, [0.0, 0.0, 10.0])
         mvPushMatrix()
         mat4.rotate(mvMatrix, mvMatrix, glMatrix.toRadian(rSquare), [0.0, 0.0, 0.0])
         //mat4.rotateX(mvMatrix, mvMatrix, glMatrix.toRadian(rSquare))
