@@ -104,6 +104,8 @@
         gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, mvMatrix)
       }
 
+
+      var arahRotasi = 1.0 
       var triangleVertexPositionBuffer
       var triangleVertexColorBuffer
       var triangleVertexIndexBuffer
@@ -283,55 +285,55 @@
         gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer)
         vertices = [
           //depan
-          -20.0, -20.0, 20.0,
-          20.0, -20.0, 20.0,
+          -10.0, -10.0, 10.0,
+          10.0, -10.0, 10.0,
 
-          20.0, -20.0, 20.0,
-          20.0, 20.0, 20.0,
+          10.0, -10.0, 10.0,
+          10.0, 10.0, 10.0,
 
-          20.0, 20.0, 20.0,
-          -20.0, 20.0, 20.0,
+          10.0, 10.0, 10.0,
+          -10.0, 10.0, 10.0,
 
-          -20.0, 20.0, 20.0,
-          -20.0, -20.0, 20.0,
+          -10.0, 10.0, 10.0,
+          -10.0, -10.0, 10.0,
           
           //belakang
-          -20.0, -20.0, -20.0,
-          20.0, -20.0, -20.0,
+          -10.0, -10.0, -10.0,
+          10.0, -10.0, -10.0,
 
-          20.0, -20.0, -20.0,
-          20.0, 20.0, -20.0,
+          10.0, -10.0, -10.0,
+          10.0, 10.0, -10.0,
 
-          20.0, 20.0, -20.0,
-          -20.0, 20.0, -20.0,
+          10.0, 10.0, -10.0,
+          -10.0, 10.0, -10.0,
 
-          -20.0, 20.0, -20.0,
-          -20.0, -20.0, -20.0,
+          -10.0, 10.0, -10.0,
+          -10.0, -10.0, -10.0,
           
           // lebar
-          -20.0, -20.0, 20.0,
-          -20.0, -20.0, -20.0,
+          -10.0, -10.0, 10.0,
+          -10.0, -10.0, -10.0,
 
-          20.0, -20.0, 20.0,
-          20.0, -20.0, -20.0,
+          10.0, -10.0, 10.0,
+          10.0, -10.0, -10.0,
 
-          20.0, 20.0, 20.0,
-          20.0, 20.0, -20.0,
+          10.0, 10.0, 10.0,
+          10.0, 10.0, -10.0,
 
-          -20.0, 20.0, 20.0,
-          -20.0, 20.0, -20.0
+          -10.0, 10.0, 10.0,
+          -10.0, 10.0, -10.0
         ]
         //////////////////-------------
         cBound = [
-          [-20.0, 20.0, 20.0, 1.0],
-          [20.0, 20.0, 20.0, 1.0],
-          [20.0, -20.0, 20.0, 1.0],
-          [-20.0, -20.0, 20.0, 1.0],
+          [-10.0, 10.0, 10.0, 1.0],
+          [10.0, 10.0, 10.0, 1.0],
+          [10.0, -10.0, 10.0, 1.0],
+          [-10.0, -10.0, 10.0, 1.0],
 
-          [-20.0, 20.0, -20.0, 1.0],
-          [20.0, 20.0, -20.0, 1.0],
-          [20.0, -20.0, -20.0, 1.0],
-          [-20.0, -20.0, -20.0, 1.0]
+          [-10.0, 10.0, -10.0, 1.0],
+          [10.0, 10.0, -10.0, 1.0],
+          [10.0, -10.0, -10.0, 1.0],
+          [-10.0, -10.0, -10.0, 1.0]
         ]
 
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW)
@@ -364,6 +366,7 @@
             if (xDirect > 0) {
               xDirect = xDirect * (-1.0)
               rot *= -1.0
+              arahRotasi = arahRotasi * -1.0
             }
           }
         }
@@ -372,6 +375,7 @@
             if (xDirect < 0) {
               xDirect = xDirect*(-1.0)
               rot *= -1.0
+              arahRotasi = arahRotasi * -1.0
             }
           } 
         }
@@ -380,6 +384,7 @@
             if (yDirect > 0) {
               yDirect = yDirect*(-1.0)
               rot *= -1.0
+              arahRotasi = arahRotasi * -1.0
             }
           }
         }
@@ -388,6 +393,7 @@
             if (yDirect < 0) {
               yDirect = yDirect*(-1.0)
               rot *= -1.0
+              arahRotasi = arahRotasi * -1.0
             }
           }
         }
@@ -396,6 +402,7 @@
             if (zDirect > 0) {
               zDirect = zDirect*(-1.0)
               rot *= -1.0
+              arahRotasi = arahRotasi * -1.0
             }
           }
         }
@@ -404,6 +411,7 @@
             if (zDirect < 0) {
               zDirect = zDirect*(-1.0)
               rot *= -1.0
+              arahRotasi = arahRotasi * -1.0
             }
           }
         }
@@ -426,10 +434,10 @@
       function drawScene() {
         gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight)
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-        mat4.perspective(pMatrix, glMatrix.toRadian(45), gl.viewportWidth / gl.viewportHeight, 0.1, 100.0)
+        mat4.perspective(pMatrix, glMatrix.toRadian(45), gl.viewportWidth / gl.viewportHeight, 0.1, 500.0)
         mat4.identity(mvMatrix)
         //character
-        mat4.translate(mvMatrix, mvMatrix, [0.0, 0.0, -70.0])
+        mat4.translate(mvMatrix, mvMatrix, [0.0, 0.0, -40.0])
         mvPushMatrix()
         mat4.translate(mvMatrix, mvMatrix, [a, b, c])
         mat4.rotate(mvMatrix, mvMatrix, glMatrix.toRadian(rTri), [0.0, 1.0, 0.0])
@@ -451,7 +459,7 @@
         mvPopMatrix()
 
         // kubus
-        mat4.translate(mvMatrix, mvMatrix, [0.0, 0.0, -5.0])
+        mat4.translate(mvMatrix, mvMatrix, [0.0, 0.0, 0.0])
         mvPushMatrix()
         mat4.rotate(mvMatrix, mvMatrix, glMatrix.toRadian(rSquare), [0.0, 0.0, 0.0])
         //mat4.rotateX(mvMatrix, mvMatrix, glMatrix.toRadian(rSquare))
@@ -484,7 +492,7 @@
         var timeNow = new Date().getTime()
         if (lastTime != 0) {
           var elapsed = timeNow - lastTime
-          rTri += (90 * elapsed) / 1000.0
+          rTri += ((90 * elapsed) / 1000.0)*arahRotasi
           // rSquare += (75 * elapsed) / 1000.0
           mobile()
         }
